@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-import os
+import os, json
 from flask import Flask, request, jsonify, url_for
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
@@ -24,6 +24,34 @@ def handle_invalid_usage(error):
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
+
+@app.route('/member', methods=['POST'])
+def handle_new():
+    body = request.json
+    jackson_family.add_member(body)
+    members = jackson_family.get_all_members()
+    response_body = {
+        "family": members
+    }
+    return jsonify(response_body), 200
+
+
+@app.route('/member/<int:member_id>', methods=['DELETE'])
+def handle_delete(member_id):
+    body = request.json
+    removed = jackson_family.delete_member(member_id)
+    response_body = {
+        "Deleted members": removed
+    }
+    return jsonify(response_body), 200
+
+@app.route('/member/<int:member_id>', methods=['GET'])
+def handle_member(member_id):
+    member = jackson_family.get_member(member_id) 
+    response_body = {
+        "Member": member
+    }
+    return jsonify(response_body), 200
 
 @app.route('/members', methods=['GET'])
 def handle_hello():
